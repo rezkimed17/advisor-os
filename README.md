@@ -196,6 +196,37 @@ When a skill fails at runtime:
 
 ---
 
+## CI/CD -- Auto-Deploy on PR Merge
+
+A GitHub Actions workflow (`.github/workflows/deploy.yml`) automatically
+redeploys the application whenever a Pull Request is merged to `main`.
+
+It runs on a **self-hosted runner** on the same machine as Docker Compose.
+
+### Setup the Self-Hosted Runner
+
+1. Go to `github.com/rezkimed17/advisor-os` **Settings > Actions > Runners > New self-hosted runner**
+2. Select **macOS** and follow the download/configure steps provided by GitHub
+3. Start the runner:
+
+```bash
+cd actions-runner && ./run.sh
+```
+
+Once the runner is online, every merged PR will automatically:
+- Pull the latest code from `main`
+- Rebuild and restart the Docker Compose stack
+- Prune dangling images
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `.github/workflows/deploy.yml` | Triggers on PR merge to main |
+| `deploy.sh` | Pulls latest code and runs `docker compose up --build -d` |
+
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

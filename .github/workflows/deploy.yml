@@ -1,0 +1,19 @@
+name: Deploy on Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run deploy script
+        run: |
+          chmod +x ./deploy.sh
+          ./deploy.sh
