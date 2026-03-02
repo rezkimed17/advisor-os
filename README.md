@@ -198,4 +198,4 @@ When a skill fails at runtime:
 
 ## License
 
-Proprietary. All rights reserved.
+This project is licensed under the [MIT License](LICENSE).
