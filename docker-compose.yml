@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # -- Advisor-OS (Discord Bot + HTTP Server) --------------------------------
   advisor:

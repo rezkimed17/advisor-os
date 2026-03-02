@@ -6,8 +6,10 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$SCRIPT_DIR"
+# The canonical project directory where Docker Compose and .env reside.
+# This must be an absolute path because the GitHub Actions runner checks out
+# code into its own working directory, not the live project directory.
+PROJECT_DIR="${ADVISOR_OS_DIR:-/Users/mohammedrezki/Desktop/advisor-os}"
 
 echo "[deploy] Pulling latest changes..."
 git -C "$PROJECT_DIR" pull origin main

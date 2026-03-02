@@ -9,11 +9,12 @@ jobs:
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: self-hosted
+    env:
+      ADVISOR_OS_DIR: /Users/mohammedrezki/Desktop/advisor-os
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Run deploy script
+      - name: Deploy from live project directory
         run: |
+          cd "$ADVISOR_OS_DIR"
+          git pull origin main
           chmod +x ./deploy.sh
           ./deploy.sh
