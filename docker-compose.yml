@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  # -- Advisor-OS (Discord Bot + HTTP Server) --------------------------------
+  advisor:
+    build: .
+    container_name: advisor-os
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./skills:/app/skills
+    depends_on:
+      - ngrok
+
+  # -- ngrok Sidecar (Tunnel for Webhooks) -----------------------------------
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: advisor-os-ngrok
+    restart: unless-stopped
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    command: http advisor:3000 --log stdout
+    ports:
+      - "4040:4040"

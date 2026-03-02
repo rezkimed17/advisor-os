@@ -1,0 +1,30 @@
+# -- Dependencies --
+node_modules/
+
+# -- Environment --
+.env
+.env.local
+.env.*.local
+
+# -- Bun --
+bun.lockb
+
+# -- Build --
+dist/
+.next/
+out/
+
+# -- OS --
+.DS_Store
+Thumbs.db
+
+# -- IDE --
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursor/
+
+# -- Logs --
+*.log
+npm-debug.log*
