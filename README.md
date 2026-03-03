@@ -205,13 +205,34 @@ It runs on a **self-hosted runner** on the same machine as Docker Compose.
 
 ### Setup the Self-Hosted Runner
 
-1. Go to `github.com/rezkimed17/advisor-os` **Settings > Actions > Runners > New self-hosted runner**
-2. Select **macOS** and follow the download/configure steps provided by GitHub
-3. Start the runner:
+```bash
+mkdir actions-runner && cd actions-runner
+
+curl -o actions-runner-osx-x64-2.331.0.tar.gz -L \
+  https://github.com/actions/runner/releases/download/v2.331.0/actions-runner-osx-x64-2.331.0.tar.gz
+
+tar xzf ./actions-runner-osx-x64-2.331.0.tar.gz
+
+./config.sh --url https://github.com/<owner>/<repo> --token <RUNNER_TOKEN>
+```
+
+Replace `<owner>/<repo>` with the repository path and `<RUNNER_TOKEN>` with the
+token generated from **Settings > Actions > Runners > New self-hosted runner**.
+
+Start the runner:
 
 ```bash
-cd actions-runner && ./run.sh
+./run.sh
 ```
+
+### Configuration
+
+The deploy script requires the `ADVISOR_OS_DIR` environment variable, which
+points to the live project directory where `.env` and Docker Compose reside.
+This is set in the workflow file (`.github/workflows/deploy.yml`) and never
+hardcoded in the script itself.
+
+### Deploy Behavior
 
 Once the runner is online, every merged PR will automatically:
 - Pull the latest code from `main`

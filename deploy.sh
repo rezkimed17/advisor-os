@@ -7,9 +7,13 @@
 set -euo pipefail
 
 # The canonical project directory where Docker Compose and .env reside.
-# This must be an absolute path because the GitHub Actions runner checks out
-# code into its own working directory, not the live project directory.
-PROJECT_DIR="${ADVISOR_OS_DIR:-/Users/mohammedrezki/Desktop/advisor-os}"
+# Set via the ADVISOR_OS_DIR environment variable (defined in the GitHub
+# Actions workflow, never hardcoded here).
+if [ -z "${ADVISOR_OS_DIR:-}" ]; then
+  echo "[deploy] Error: ADVISOR_OS_DIR is not set." >&2
+  exit 1
+fi
+PROJECT_DIR="$ADVISOR_OS_DIR"
 
 echo "[deploy] Pulling latest changes..."
 git -C "$PROJECT_DIR" pull origin main

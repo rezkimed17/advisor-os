@@ -124,19 +124,35 @@ async function createNewSkill(
     channelName: string,
     userMessage: string,
 ): Promise<string> {
-    const skillName = deriveSkillName(userMessage);
+    const skillName = await deriveSkillName(userMessage);
 
-    // Ask the LLM to generate a skill file.
+    // Ask the LLM to generate a GENERIC skill file.
     const prompt = [
-        "You are an AI that generates skill definition files in Markdown with YAML frontmatter.",
-        "Generate a skill file for the following request. The file must include:",
-        "- YAML frontmatter with: name, description, group, triggers (array of keywords)",
+        "You are an AI that generates reusable skill definition files in Markdown with YAML frontmatter.",
+        "",
+        "CRITICAL RULE: The skill MUST be GENERIC and REUSABLE. Do NOT create a skill",
+        "that only handles the specific example in the user's request. Instead, abstract",
+        "the request into a broad capability.",
+        "",
+        "Examples of correct generalization:",
+        '- "translate hello to Spanish" -> a general Translation skill (any language pair)',
+        '- "summarize this article about AI" -> a general Summarization skill (any content)',
+        '- "write a Python function for sorting" -> a general Code Generation skill (any language/task)',
+        "",
+        "The file MUST include:",
+        "- YAML frontmatter with: name (kebab-case, generic), description, group, triggers (broad keywords)",
         `- The group MUST be: ${channelName}`,
-        "- A body section containing the system prompt the AI should use when this skill is invoked.",
+        "- A body section containing a GENERIC system prompt. The prompt must instruct the AI",
+        "  to handle the entire category of tasks, not just the specific example given.",
+        "- The system prompt must tell the AI to ask for clarification if the user's input",
+        "  is ambiguous (e.g., which target language for translation).",
+        "",
+        "Do NOT include hardcoded examples, specific languages, or specific inputs in the",
+        "system prompt body. Keep it generic and parameterized.",
         "",
         "Return ONLY the raw Markdown content, no surrounding code fences.",
         "",
-        `User request: ${userMessage}`,
+        `User request (use this to identify the CATEGORY, not as the exact scope): ${userMessage}`,
     ].join("\n");
 
     const skillContent = await callModel(prompt, userMessage);
@@ -278,12 +294,37 @@ async function attemptAutoFix(
 // Helpers
 // ---------------------------------------------------------------------------
 
-function deriveSkillName(message: string): string {
-    return message
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
+async function deriveSkillName(message: string): Promise<string> {
+    const response = await client.chat.completions.create({
+        model: MODEL,
+        messages: [
+            {
+                role: "system",
+                content: [
+                    "Extract the broad capability category from the user's request.",
+                    "Return ONLY a short kebab-case name (1-3 words) for the GENERIC skill.",
+                    "",
+                    "Examples:",
+                    '"translate this to Spanish" -> translation',
+                    '"summarize this article about dogs" -> summarization',
+                    '"write a Python sort function" -> code-generation',
+                    '"review my PR" -> code-review',
+                    '"explain quantum physics" -> explanation',
+                    "",
+                    "Return ONLY the kebab-case name, nothing else.",
+                ].join("\n"),
+            },
+            { role: "user", content: message },
+        ],
+        max_tokens: 32,
+    });
+
+    const name = (response.choices[0]?.message?.content ?? "unknown-skill")
         .trim()
-        .split(/\s+/)
-        .slice(0, 4)
-        .join("-");
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+
+    return name || "unknown-skill";
 }
