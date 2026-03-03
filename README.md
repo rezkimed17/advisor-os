@@ -205,25 +205,8 @@ It runs on a **self-hosted runner** on the same machine as Docker Compose.
 
 ### Setup the Self-Hosted Runner
 
-```bash
-mkdir actions-runner && cd actions-runner
-
-curl -o actions-runner-osx-x64-2.331.0.tar.gz -L \
-  https://github.com/actions/runner/releases/download/v2.331.0/actions-runner-osx-x64-2.331.0.tar.gz
-
-tar xzf ./actions-runner-osx-x64-2.331.0.tar.gz
-
-./config.sh --url https://github.com/<owner>/<repo> --token <RUNNER_TOKEN>
-```
-
-Replace `<owner>/<repo>` with the repository path and `<RUNNER_TOKEN>` with the
-token generated from **Settings > Actions > Runners > New self-hosted runner**.
-
-Start the runner:
-
-```bash
-./run.sh
-```
+1. Go to **Settings > Actions > Runners > Self-hosted runners > Add runner** and follow the instructions provided by GitHub.
+2. Once configured, start the runner:
 
 ### Configuration
 
